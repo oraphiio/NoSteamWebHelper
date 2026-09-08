@@ -394,11 +394,10 @@ static DWORD WINAPI MainThreadProc(LPVOID lpParameter) {
     return EXIT_SUCCESS;
 }
 
-BOOL WINAPI DllMainCRTStartup(HINSTANCE hLibModule, DWORD dwReason, LPVOID lpReserved) {
+BOOL WINAPI DllMain(HINSTANCE hLibModule, DWORD dwReason, LPVOID lpReserved) {
     if (dwReason == DLL_PROCESS_ATTACH) {
         DisableThreadLibraryCalls(hLibModule);
 
-        // Load Config
         wchar_t path[MAX_PATH];
         GetModuleFileNameW(hLibModule, path, MAX_PATH);
         PathRemoveFileSpecW(path);
@@ -412,5 +411,6 @@ BOOL WINAPI DllMainCRTStartup(HINSTANCE hLibModule, DWORD dwReason, LPVOID lpRes
         if (g_TrayIconData.hWnd)
             Shell_NotifyIconW(NIM_DELETE, &g_TrayIconData);
     }
+
     return TRUE;
 }
