@@ -3,17 +3,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-// Define globals here so Library.c can access them via extern
+// Define globals here
 SUPPRESSION_MODE g_CurrentMode = MODE_AGGRESSIVE;
 AppConfig g_Config = { .mode = MODE_AGGRESSIVE, .showRamUsage = true, .autoDetectSiSR = true };
-
-static const wchar_t* GetModeString(SUPPRESSION_MODE mode) {
-    switch (mode) {
-        case MODE_SELECTIVE: return L"Selective";
-        case MODE_DISABLED: return L"Disabled";
-        default: return L"Aggressive";
-    }
-}
 
 void LoadConfig(const wchar_t* path) {
     FILE* f = _wfopen(path, L"r");
@@ -49,13 +41,13 @@ BOOL ShouldKillProcess(const WCHAR* cmdLine, SUPPRESSION_MODE mode) {
     if (mode == MODE_DISABLED) return FALSE;
     if (!cmdLine) return TRUE;
 
-    // Always keep broker alive in Selective mode
+    // Selective mode: Keep broker/GPU processes
     if (mode == MODE_SELECTIVE) {
         if (wcsstr(cmdLine, L"--type=broker")) return FALSE;
         if (wcsstr(cmdLine, L"--type=gpu-process")) return FALSE;
     }
 
-    // Kill anything that looks like a renderer or helper
+    // Kill anything that looks like a renderer/helper
     if (wcsstr(cmdLine, L"steamwebhelper")) return TRUE;
 
     return FALSE;
